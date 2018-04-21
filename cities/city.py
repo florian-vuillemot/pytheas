@@ -4,7 +4,7 @@ A city is a representation of a real city in the world.
 '''
 import json
 import os
-from typing import Union, List
+from typing import Union, Iterable
 
 # Files that contain cities of Belgium
 CITIES_FILE = os.path.join(os.path.dirname(__file__), "zipcode-belgium.json")
@@ -39,17 +39,12 @@ class City():
 def get_cities(filename: str = CITIES_FILE,
                city_field: str = 'city',
                longitude_field: str = 'lng',
-               latitude_field: str = 'lat') -> List['City']:
+               latitude_field: str = 'lat') -> Iterable['City']:
     '''
     Return all cities from a json file.
     '''
-    cities = []  # type: List['City']
-
     with open(filename) as fcities:
         for city_info in json.loads(fcities.read()):
-            city = City(name=city_info[city_field],
-                        longitude=city_info[longitude_field],
-                        latitude=city_info[latitude_field])
-            cities.append(city)
-
-    return cities
+            yield City(name=city_info[city_field],
+                       longitude=city_info[longitude_field],
+                       latitude=city_info[latitude_field])

@@ -21,7 +21,7 @@ class TestCity(unittest.TestCase):
 
 class TestGetCities(unittest.TestCase):
     def test_numbers(self):
-        self.assertEqual(len(get_cities()), 2757)
+        self.assertEqual(len(list(get_cities())), 2757)
 
 
 if __name__ == '__main__':
