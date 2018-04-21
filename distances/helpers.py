@@ -1,5 +1,6 @@
 '''
 Helpers methods for make calcul on distances.
+We considere that a distance can be in km or hours.
 '''
 from typing import List, Dict, Tuple, Union, Any, Callable, Iterable
 
