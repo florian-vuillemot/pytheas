@@ -20,7 +20,7 @@ def get_random_path(ref_city: 'City', cities: List['City'],
                                         points=cities,
                                         distance_calculator=distance_calculator,
                                         radius=_distance))
-    first_city = get_random_city(distances_ref)
+    first_city = _get_first_city(distances_ref)
     other_cities = extract_city(first_city.name, cities)[1]
     distances_first = list(keep_in_circle(reference_point=first_city,
                                           points=other_cities,
@@ -30,8 +30,12 @@ def get_random_path(ref_city: 'City', cities: List['City'],
     return (first_city, second_city)
 
 
-def _get_second_city(l1: List[Tuple[float, 'City']], l2: List[Tuple[float, 'City']])\
-    -> 'City':
+def _get_second_city(l1: List[Tuple[float, 'City']],
+                     l2: List[Tuple[float, 'City']])\
+                     -> 'City':
+    '''
+    Get cities in union between lists and return the city farest
+    '''
     points = []  # type: List[Tuple[float, 'City']]
     for i in l1:
         for j in l2:
@@ -40,7 +44,8 @@ def _get_second_city(l1: List[Tuple[float, 'City']], l2: List[Tuple[float, 'City
                 break
     return max(points, key=lambda x: x[0])[1][1]
 
-def get_random_city(cities_distances: List[Tuple[float, 'City']],
+
+def _get_first_city(cities_distances: List[Tuple[float, 'City']],
                     nb_random: int = 10) -> 'City':
     '''
     Select the city with the biggest distance from nb_random city select
