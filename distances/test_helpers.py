@@ -42,10 +42,13 @@ class TestHelpers(unittest.TestCase):
         # Radius <= 2
         params['distance_calculator'] = radius_distance_eq2_or_eq1
         self.assertEqual(len(list(keep_in_circle(radius=2, **params))), 2)
+        # Radius == 3
         params['distance_calculator'] = radius_distance_eq3
         self.assertEqual(len(list(keep_in_circle(radius=1, **params))), 1)
+        # All radius
         params['distance_calculator'] = radius_distance_all_1
         self.assertEqual(len(list(keep_in_circle(radius=2, **params))), nb_points)
+        # No radius
         params['distance_calculator'] = radius_distance_all_1
         self.assertEqual(len(list(keep_in_circle(radius=0, **params))), 0)
 
