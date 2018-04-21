@@ -21,7 +21,7 @@ def evaluate_all_distance(points: List[GPSPoint],
     '''
     for i in range(len(points)):
         pnt = points[i]
-        for (d, oth) in (distances_from_point(pnt, points[i + 1:], **args)):
+        for (d, oth) in distances_from_point(pnt, points[i + 1:], **args):
             yield (d, pnt, oth)
 
 
@@ -33,7 +33,7 @@ def keep_in_circle(reference_point: GPSPoint,
     '''
     Keep all element points in a circle around the reference point
     '''
-    for (d, oth) in (distances_from_point(reference_point, points, **args)):
+    for (d, oth) in distances_from_point(reference_point, points, **args):
         if d <= radius:
             yield (d, oth)
 
