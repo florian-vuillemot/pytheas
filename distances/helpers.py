@@ -35,7 +35,7 @@ def keep_in_circle(reference_point: GPSPoint,
     '''
     for (d, oth) in (distances_from_point(reference_point, points, **args)):
         if d <= radius:
-            yield (d, reference_point, oth)
+            yield (d, oth)
 
 
 def distances_from_point(reference: GPSPoint,
