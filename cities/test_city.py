@@ -15,8 +15,8 @@ class TestCity(unittest.TestCase):
         for values in self.init_values:
             city = City(**values)
             self.assertEqual(city.name, values.get('name', None))
-            self.assertEqual(city.lat, values.get('latitude', None))
-            self.assertEqual(city.lon, values.get('longitude', None))
+            self.assertEqual(city.latitude, values.get('latitude', None))
+            self.assertEqual(city.longitude, values.get('longitude', None))
 
 
 class TestGetCities(unittest.TestCase):

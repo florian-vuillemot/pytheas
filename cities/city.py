@@ -21,11 +21,20 @@ class City():
         self.name = name
 
         # GPS positions
-        self.lon = longitude
-        self.lat = latitude
+        self.longitude = longitude
+        self.latitude = latitude
 
     def __str__(self):
-        return f"City name: {self.name}, longitude: {self.lon}, latitude: {self.lat}"
+        return f"City name: {self.name}, longitude: {self.longitude}, latitude: {self.latitude}"
+
+    def __getitem__(self, key: str):
+        return self.__dict__[key]
+
+    def __eq__(self, oth: 'City'):
+        return self.name == oth.name and\
+            self.longitude == oth.longitude and\
+            self.latitude == oth.latitude
+
 
 def get_cities(filename: str = CITIES_FILE,
                city_field: str = 'city',
