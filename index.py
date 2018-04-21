@@ -72,6 +72,6 @@ def d_calculator(**args) -> float:
 if __name__ == '__main__':
     city_name = 'Bruxelles'
     distance = 1
-    city, cities = extract_city(city_name, get_cities())
+    city, cities = extract_city(city_name, list(get_cities()))
     c1, c2 = get_random_path(city, cities, distance, d_calculator)
     print(city, c1.name, c2.name)
