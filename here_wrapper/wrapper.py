@@ -33,13 +33,13 @@ class Routing(Here):
     def __init__(self, **args):
         super().__init__(**args)
 
-    def calculate_route(self, dlat, dlon, alat, alon) -> Tuple[float, float]:
+    def calculate_route(self, lat1, lon1, lat2, lon2) -> Tuple[float, float]:
         '''
         Return tuple with distance (km) and time (min)
         '''
         params = {
-            'waypoint0': f'geo!{dlat},{dlon}',
-            'waypoint1': f'geo!{alat},{alon}',
+            'waypoint0': f'geo!{lat1},{lon1}',
+            'waypoint1': f'geo!{lat2},{lon2}',
             'mode': 'shortest;car;traffic:disabled'
         }
         r = self.get(self.calculateroute, params)
