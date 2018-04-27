@@ -3,13 +3,14 @@ import random
 from typing import Iterable, Tuple, List
 from cities.city import get_cities
 from distances.helpers import distances_from_point, keep_in_circle,\
-    DistanceCalculator
+    DistanceCalculator, BatchCalculator
 from distances.haversine.haversine import haversine, time_estimation
-
+from here_wrapper.wrapper import Routing
 
 def get_random_path(ref_city: 'City', cities: List['City'],
                     distance: float,
-                    distance_calculator: DistanceCalculator)\
+                    distance_calculator: DistanceCalculator,
+                    batch_calculator: BatchCalculator)\
                     -> Tuple['City', 'City']:
     '''
     Create a random path by selecting 2 cities
@@ -19,12 +20,14 @@ def get_random_path(ref_city: 'City', cities: List['City'],
     distances_ref = list(keep_in_circle(reference_point=ref_city,
                                         points=cities,
                                         distance_calculator=distance_calculator,
+                                        batch_calculator=batch_calculator,
                                         radius=_distance))
     first_city = _get_first_city(distances_ref)
     other_cities = extract_city(first_city.name, cities)[1]
     distances_first = list(keep_in_circle(reference_point=first_city,
                                           points=other_cities,
                                           distance_calculator=distance_calculator,
+                                          batch_calculator=batch_calculator,
                                           radius=_distance))
     second_city = _get_second_city(distances_ref, distances_first)
     return (first_city, second_city)
@@ -65,13 +68,19 @@ def extract_city(city_name: str, cities: List['City'])\
 
 
 def d_calculator(**args) -> float:
+#    return Routing().calculate_route(**args)[1]
     haversine_distance = haversine(**args)
     return time_estimation(haversine_distance, 30)
 
+def batch_calculator(**args) -> Iterable[float]:
+    return Routing().batch_calculate_route(**args)
 
 if __name__ == '__main__':
     city_name = 'Bruxelles'
     distance = 1
     city, cities = extract_city(city_name, list(get_cities()))
-    c1, c2 = get_random_path(city, cities, distance, d_calculator)
+    c1, c2 = get_random_path(ref_city=city, cities=cities,
+                             distance=distance,
+                             distance_calculator=None,#d_calculator,
+                             batch_calculator=batch_calculator)
     print(city, c1.name, c2.name)
