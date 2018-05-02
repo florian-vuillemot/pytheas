@@ -1,6 +1,7 @@
 import os
 import requests
-from typing import Dict, Any, Tuple, Iterable
+from typing import Dict, Any, Tuple, Iterable, Union
+GPSPoint = Dict[str, Union[float, Any]]
 
 
 class HereError(Exception):
@@ -46,23 +47,26 @@ class Routing(Here):
         s = r['response']['route'][-1]['summary']
         return (s['distance'] / 1000, s['baseTime'] / 60)
 
-    def batch_calculate_route(self, reference, points,
-                              latitude_key, longitude_key) -> Iterable[float]:
+    def batch_calculate_route(self, reference: GPSPoint,
+                              points: List[GPSPoint],
+                              latitude_key: str, longitude_key: str)\
+                              -> Iterable[Tuple[GPSPoint, float, float]]:
         '''
+        Return point, distance and time estimation between points and reference
         '''
+        assert(len(points) < 11)
         params = {
             'start0': f'geo!{reference[latitude_key]},{reference[longitude_key]}',
-            'mode': 'shortest;car;traffic:disabled'
+            'mode': 'shortest;car;traffic:disabled',
+            'summaryAttributes': 'distance,traveltime'
         }
         for idx, p in enumerate(points):
             pos = f'geo!{p[latitude_key]},{p[longitude_key]}'
             params[f'destination{idx}'] = pos
-            if idx == 10:
-                break
         r = self.get(self.matrixroute, params)
-        print(r)
-        import sys
-        sys.exit(0)
+        distances = r['response']['matrixEntry']
+        for d in distances:
+            yield d['destinationIndex'], d['distance']/1000, d['travelTime']/60
 
     @property
     def calculateroute(self):
