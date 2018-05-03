@@ -51,7 +51,8 @@ class Routing(Here):
                               **args)\
                               -> Iterable[Tuple[GPSPoint, float, float]]:
         '''
-        Return point, distance and time estimation between points and reference
+        Return point and distance or time estimation between
+        each point and the reference point
         '''
         for i in range(0, len(points), 100):
             for r in self._batch_calculate_route(reference,
@@ -67,7 +68,7 @@ class Routing(Here):
         params = {
             'start0': f'geo!{reference[latitude_key]},{reference[longitude_key]}',
             'mode': 'shortest;car;traffic:disabled',
-            'summaryAttributes': 'distance,traveltime'
+            'summaryAttributes': 'traveltime' if select_time else 'distance'
         }
         for idx, p in enumerate(points):
             pos = f'geo!{p[latitude_key]},{p[longitude_key]}'
