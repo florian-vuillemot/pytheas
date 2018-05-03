@@ -1,11 +1,11 @@
-import copy
 import random
 from typing import Iterable, Tuple, List
 from cities.city import get_cities
-from distances.helpers import distances_from_point, keep_in_circle,\
-    DistanceCalculator, BatchCalculator
+from distances.helpers import keep_in_circle,\
+    DistanceCalculator, BatchCalculator, GPSPoint
 from distances.haversine.haversine import haversine, time_estimation
 from here_wrapper.wrapper import Routing
+
 
 def get_random_path(ref_city: 'City', cities: List['City'],
                     distance: float,
@@ -72,12 +72,16 @@ def d_calculator(**args) -> float:
     haversine_distance = haversine(**args)
     return time_estimation(haversine_distance, 30)
 
-def batch_calculator(**args) -> Iterable[float]:
+
+def batch_calculator(**args) -> Iterable[Tuple[GPSPoint, float, float]]:
+    # Base distance on time in min, not distance in km
+    args['select_time'] = True
     return Routing().batch_calculate_route(**args)
+
 
 if __name__ == '__main__':
     city_name = 'Bruxelles'
-    distance = 1
+    distance = 240
     city, cities = extract_city(city_name, list(get_cities()))
     c1, c2 = get_random_path(ref_city=city, cities=cities,
                              distance=distance,

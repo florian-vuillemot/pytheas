@@ -10,7 +10,7 @@ GPSPoint = Dict[str, Union[float, Any]]
 DistanceCalculator = Callable[[float, float, float, float], float]
 # Should take in parameters: reference, points, latitude_key, longitude_key
 BatchCalculator = Callable[
-    [GPSPoint, List[GPSPoint], str, str], Iterable[float]
+    [GPSPoint, List[GPSPoint], str, str], Iterable[Tuple[float, GPSPoint]]
 ]
 
 
@@ -48,7 +48,7 @@ def distances_from_point(reference: GPSPoint,
                          batch_calculator: BatchCalculator = None,
                          latitude_key: str = 'latitude',
                          longitude_key: str = 'longitude')\
-                         -> Iterable[Tuple[(float, GPSPoint)]]:
+                         -> Iterable[Tuple[float, GPSPoint]]:
     '''
     Return distance of each point from reference
     '''
@@ -57,13 +57,17 @@ def distances_from_point(reference: GPSPoint,
     assert(distance_calculator or batch_calculator)
 
     if batch_calculator:
-        return batch_calculator(reference=reference,
-                                points=points,
-                                latitude_key=latitude_key,
-                                longitude_key=longitude_key)
-    for point in points:
-        distance = distance_calculator(lat1=reference[latitude_key],
-                                       lon1=reference[longitude_key],
-                                       lat2=point[latitude_key],
-                                       lon2=point[longitude_key])
-        yield (distance, point)
+        batch = batch_calculator(reference=reference,
+                                 points=points,
+                                 latitude_key=latitude_key,
+                                 longitude_key=longitude_key)
+        for (pnt, mesure) in batch:
+            yield mesure, pnt
+
+    else:
+        for point in points:
+            distance = distance_calculator(lat1=reference[latitude_key],
+                                           lon1=reference[longitude_key],
+                                           lat2=point[latitude_key],
+                                           lon2=point[longitude_key])
+            yield distance, point

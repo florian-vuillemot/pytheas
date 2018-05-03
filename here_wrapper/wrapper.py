@@ -1,6 +1,6 @@
 import os
 import requests
-from typing import Dict, Any, Tuple, Iterable, Union
+from typing import Dict, Any, Tuple, Iterable, Union, List
 GPSPoint = Dict[str, Union[float, Any]]
 
 
@@ -20,7 +20,6 @@ class Here():
         params['app_id'] = os.environ['HERE_APP_ID']
         params['app_code'] = os.environ['HERE_APP_CODE']
         r = requests.get(url, params=params)
-        print(r.url)
         if r.status_code == 200:
             return r.json()
         raise HereError(f'Receive status code {r.status_code}')
@@ -49,12 +48,22 @@ class Routing(Here):
 
     def batch_calculate_route(self, reference: GPSPoint,
                               points: List[GPSPoint],
-                              latitude_key: str, longitude_key: str)\
+                              **args)\
                               -> Iterable[Tuple[GPSPoint, float, float]]:
         '''
         Return point, distance and time estimation between points and reference
         '''
-        assert(len(points) < 11)
+        for i in range(0, len(points), 100):
+            for r in self._batch_calculate_route(reference,
+                                                 points[i:i + 100],
+                                                 **args):
+                yield r
+
+    def _batch_calculate_route(self, reference: GPSPoint,
+                               points: List[GPSPoint],
+                               latitude_key: str, longitude_key: str,
+                               select_time: bool = False)\
+                               -> Iterable[Tuple[GPSPoint, float, float]]:
         params = {
             'start0': f'geo!{reference[latitude_key]},{reference[longitude_key]}',
             'mode': 'shortest;car;traffic:disabled',
@@ -66,7 +75,9 @@ class Routing(Here):
         r = self.get(self.matrixroute, params)
         distances = r['response']['matrixEntry']
         for d in distances:
-            yield d['destinationIndex'], d['distance']/1000, d['travelTime']/60
+            mesure = d['summary']['travelTime'] / 60 if select_time\
+                     else d['summary']['distance'] / 1000
+            yield points[d['destinationIndex']], mesure
 
     @property
     def calculateroute(self):
